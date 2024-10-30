@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
-import '../styles/Login.css'
 import PropTypes from 'prop-types';
+import { Container, TextField, Button, Typography, Alert } from '@mui/material';
 
 const Login = ({ onLoginSuccess }) => {
   Login.propTypes = {
@@ -50,31 +50,58 @@ const Login = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className='container-flex'>
-    <div className="login-container">
-      <form onSubmit={handleSubmit}>
-        <h2>Iniciar Sesión</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        {error && <p className="error-message">{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Cargando...' : 'Acceder'}
-        </button>
-      </form>
-    </div>
-    </div>
+    <Container maxWidth="xs" sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+      <Container sx={{ p: 3, borderRadius: '10px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundImage: `url('/src/imgs/login.jpg')`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }}>
+        <Typography variant="h4" component="h2" align="center" gutterBottom sx={{ fontWeight: 'bold', color: 'white', fontFamily: 'Arial, sans-serif', textShadow: '1px 1px 2px black' }}>
+          Iniciar Sesión
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            variant="filled"
+            color="secondary"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            sx={{ backgroundColor: 'white', borderRadius: '5px'}}
+          />
+          <TextField
+            variant="filled"
+            color="secondary"
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Contraseña"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            sx={{ backgroundColor: 'white', borderRadius: '5px' }}
+          />
+          {error && (
+            <Alert severity="error" sx={{ width: '90%', mt: 2 }}>{error}</Alert>
+          )}
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3, mb: 2 }}
+            disabled={loading}
+          >
+            {loading ? 'Cargando...' : 'Acceder'}
+          </Button>
+        </form>
+      </Container>
+    </Container>
   );
 };
 
