@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import '../styles/Cars.css'
 import PropTypes from 'prop-types';
+import { Container, Typography, TextField, Grid, Box, IconButton } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const Cars = ({ carBrands, carModels }) => {
   const [selectedBrand, setSelectedBrand] = useState(null);
@@ -14,46 +15,87 @@ const Cars = ({ carBrands, carModels }) => {
     setSearchQuery(event.target.value);
   };
 
-  const filteredBrands = carBrands.filter((brand) => 
+  const filteredBrands = carBrands.filter((brand) =>
     brand.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredModels = carModels.filter((model) => {
-    const brand = carBrands.find((b) => b.code === model.brand_code);
-    return brand && brand.name.toLowerCase().includes(searchQuery.toLowerCase());
+  const brandToModels = {};
+  carModels.forEach((model) => {
+    const brandCode = model.brand_code;
+    if (!brandToModels[brandCode]) {
+      brandToModels[brandCode] = [];
+    }
+    brandToModels[brandCode].push(model);
   });
 
+
   return (
-    <div className="cars-container">
-      <div className="cars-search">
-        <h2>Modelos de Autos</h2>
-        <input
-          type="text"
-          placeholder="Buscar marca..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-      </div>
-      <div className="brands-grid">
-        {filteredBrands.map((brand) => (
-          <div
-            key={brand.code}
-            className={`brand-item ${selectedBrand === brand.code ? 'expanded' : ''}`}
-            onClick={() => handleBrandClick(brand.code)}
-            style={{ cursor: 'pointer' }}
-          >
-            <h3>{brand.name}</h3>
-            <ul>
-              {filteredModels
-                .filter((model) => model.brand_code === brand.code)
-                .map((model) => (
-                  <li key={model.id}>{model.name}</li>
-                ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </div>
+    <Container maxWidth="lg" sx={{ mt: 8 }}>
+      <Typography variant="h4" align="center" gutterBottom>
+        Modelos de Autos
+      </Typography>
+      <TextField
+        variant="filled"
+        color="black"
+        label="Buscar marca..."
+        fullWidth
+        sx={{ mb: 4 }}
+        value={searchQuery}
+        onChange={handleSearchChange}
+      />
+      <Grid container spacing={4} sx={{ justifyContent: 'center' }}>
+        {filteredBrands.map((brand) => {
+          return (
+            <Grid item xs={12} sm={6} md={4} key={brand.code}>
+              <Box
+                sx={{
+                  backgroundColor: 'white',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+                  marginBottom: '20px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  width: '90%',
+                  height: 'fit-content',
+                }}
+              >
+                <Box onClick={() => handleBrandClick(brand.code)} display="flex" justifyContent="space-between" alignItems="center">
+                  <Typography variant="h6" >{brand.name}</Typography>
+                  <IconButton size="small">
+                    <ExpandMoreIcon />
+                  </IconButton>
+                </Box>
+                <Box
+                  sx={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                    maxHeight: selectedBrand === brand.code ? '200px' : 0,
+                    overflow: 'auto',
+                    transition: 'max-height 0.3s ease',
+                    backgroundColor: '#fff',
+                    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+                    borderRadius: '5px',
+                    position: 'absolute',
+                    top: '90%',
+                    left: 0,
+                    right: 0,
+                    width: '100%',
+                    zIndex: 1,
+                  }}
+                >
+                  {brandToModels[brand.code]?.map((model) => (
+                    <Typography key={model.id} variant="body2" sx={{ backgroundColor: 'white', padding: '5px', margin: '5px 0', display: 'block' }}>{model.name}</Typography>
+                  ))}
+                </Box>
+              </Box>
+            </Grid>
+          );
+        })}
+      </Grid>
+    </Container>
   );
 };
 
