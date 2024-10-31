@@ -1,11 +1,26 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Container, Typography, TextField, Grid, Box, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { create } from 'zustand';
 
-const Cars = ({ carBrands, carModels }) => {
-  const [selectedBrand, setSelectedBrand] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+const useCarsStore = create((set) => ({
+  carBrands: [],
+  carModels: [],
+  selectedBrand: null,
+  searchQuery: '',
+  setSearchQuery: (query) => set({ searchQuery: query }),
+  setSelectedBrand: (brandCode) => set({ selectedBrand: brandCode }),
+  setCarBrands: (brands) => set({ carBrands: brands }),
+  setCarModels: (models) => set({ carModels: models }),
+}));
+
+const Cars = ({ carBrands: initialCarBrands, carModels: initialCarModels }) => {
+  const { carBrands, carModels, selectedBrand, searchQuery, setSearchQuery, setSelectedBrand } = useCarsStore();
+
+  useEffect(() => {
+    useCarsStore.setState({ carBrands: initialCarBrands, carModels: initialCarModels });
+  }, [initialCarBrands, initialCarModels]);
 
   const handleBrandClick = (brandCode) => {
     setSelectedBrand(selectedBrand === brandCode ? null : brandCode);
@@ -28,7 +43,6 @@ const Cars = ({ carBrands, carModels }) => {
     brandToModels[brandCode].push(model);
   });
 
-
   return (
     <Container maxWidth="lg" sx={{ mt: 8 }}>
       <Typography variant="h4" align="center" gutterBottom>
@@ -44,7 +58,8 @@ const Cars = ({ carBrands, carModels }) => {
         onChange={handleSearchChange}
       />
       <Grid container spacing={4} sx={{ justifyContent: 'center' }}>
-        {filteredBrands.map((brand) => {
+        {filteredBrands.map((brand, index) => {
+          console.log('Brand Map:', brand, index);
           return (
             <Grid item xs={12} sm={6} md={4} key={brand.code}>
               <Box
@@ -62,7 +77,7 @@ const Cars = ({ carBrands, carModels }) => {
                 }}
               >
                 <Box onClick={() => handleBrandClick(brand.code)} display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="h6" >{brand.name}</Typography>
+                  <Typography variant="h6">{brand.name}</Typography>
                   <IconButton size="small">
                     <ExpandMoreIcon />
                   </IconButton>
@@ -86,9 +101,12 @@ const Cars = ({ carBrands, carModels }) => {
                     zIndex: 1,
                   }}
                 >
-                  {brandToModels[brand.code]?.map((model) => (
-                    <Typography key={model.id} variant="body2" sx={{ backgroundColor: 'white', padding: '5px', margin: '5px 0', display: 'block' }}>{model.name}</Typography>
-                  ))}
+                  {brandToModels[brand.code]?.map((model, index) => {
+                    console.log('Model Map:', model, index);
+                    return (
+                      <Typography key={model.id} variant="body2" sx={{ backgroundColor: 'white', padding: '5px', margin: '5px 0', display: 'block' }}>{model.name}</Typography>
+                    );
+                  })}
                 </Box>
               </Box>
             </Grid>
